@@ -25,6 +25,7 @@
     "expo": "~52.0.26",
     "expo-blur": "~14.0.2",
     "expo-constants": "~17.0.4",
+    "expo-firebase": "^0.0.0-alpha.0",
     "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",
     "expo-linking": "~7.0.4",
