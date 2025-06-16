@@ -30,10 +30,25 @@ export default function Home() {
 		}
 	};
 
+	const handleViewAllPosts = () => {
+		router.push("/posts");
+	};
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.text}>Welcome Home!</Text>
-			<TouchableOpacity style={styles.button} onPress={handleSignOut}>
+
+			<TouchableOpacity
+				style={[styles.button, styles.viewPostsButton]}
+				onPress={handleViewAllPosts}
+			>
+				<Text style={styles.buttonText}>View All Posts</Text>
+			</TouchableOpacity>
+
+			<TouchableOpacity
+				style={[styles.button, styles.signOutButton]}
+				onPress={handleSignOut}
+			>
 				<Text style={styles.buttonText}>Sign Out</Text>
 			</TouchableOpacity>
 		</View>
@@ -45,18 +60,30 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+		padding: 20,
 	},
 	text: {
 		fontSize: 24,
-		marginBottom: 20,
+		marginBottom: 30,
+		fontWeight: "bold",
 	},
 	button: {
-		backgroundColor: "red",
-		padding: 10,
-		borderRadius: 5,
+		padding: 15,
+		borderRadius: 8,
+		marginVertical: 10,
+		width: 200,
+		alignItems: "center",
+	},
+	viewPostsButton: {
+		backgroundColor: "#4CAF50",
+	},
+	signOutButton: {
+		backgroundColor: "#f44336",
 	},
 	buttonText: {
 		color: "white",
+		fontSize: 16,
+		fontWeight: "bold",
 	},
 });
 
