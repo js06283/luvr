@@ -121,7 +121,7 @@ export default function DatePage() {
 			<Text style={formStyles.header}>When did you meet?</Text>
 
 			<TouchableOpacity style={formStyles.input} onPress={showDatePickerModal}>
-				<Text style={{ color: formData.date ? "#000" : "#666" }}>
+				<Text style={{ color: formData.date ? "#fff" : "#fff" }}>
 					{formData.date || "Select Date"}
 				</Text>
 			</TouchableOpacity>
