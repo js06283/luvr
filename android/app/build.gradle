@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.anonymous.luvr'
+    namespace 'com.anonymous.lolo'
     defaultConfig {
-        applicationId 'com.anonymous.luvr'
+        applicationId 'com.anonymous.lolo'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

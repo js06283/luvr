@@ -20,6 +20,56 @@ import {
 } from "firebase/firestore";
 import { app } from "../firebaseConfig";
 
+// Elegant color palette
+const colors = {
+	primary: "#6366f1",
+	primaryLight: "#818cf8",
+	primaryDark: "#4f46e5",
+	secondary: "#f59e0b",
+	background: "#0f172a",
+	surface: "#1e293b",
+	surfaceLight: "#334155",
+	text: "#f8fafc",
+	textSecondary: "#cbd5e1",
+	textMuted: "#64748b",
+	success: "#10b981",
+	error: "#ef4444",
+	border: "#334155",
+	white: "#ffffff",
+	black: "#000000",
+};
+
+// Typography scale
+const typography = {
+	h1: { fontSize: 32, fontWeight: "700" as const },
+	h2: { fontSize: 28, fontWeight: "600" as const },
+	h3: { fontSize: 24, fontWeight: "600" as const },
+	h4: { fontSize: 20, fontWeight: "500" as const },
+	body: { fontSize: 16, fontWeight: "400" as const },
+	bodyBold: { fontSize: 16, fontWeight: "600" as const },
+	caption: { fontSize: 14, fontWeight: "400" as const },
+	small: { fontSize: 12, fontWeight: "400" as const },
+};
+
+// Spacing scale
+const spacing = {
+	xs: 4,
+	sm: 8,
+	md: 16,
+	lg: 24,
+	xl: 32,
+	xxl: 48,
+};
+
+// Border radius
+const borderRadius = {
+	sm: 6,
+	md: 12,
+	lg: 16,
+	xl: 24,
+	full: 9999,
+};
+
 interface Post {
 	id: string;
 	date: string;
@@ -141,9 +191,16 @@ export default function PostsPage() {
 
 	const renderPost = (post: Post) => {
 		return (
-			<View key={post.id} style={styles.postContainer}>
+			<View key={post.id} style={styles.postCard}>
 				<View style={styles.postHeader}>
-					<Text style={styles.postTitle}>{post.name}</Text>
+					<View style={styles.postTitleContainer}>
+						<Text style={styles.postTitle}>{post.name}</Text>
+						<View style={styles.ratingBadge}>
+							<Text style={styles.ratingText}>
+								{"★".repeat(parseInt(post.rating || "0"))}
+							</Text>
+						</View>
+					</View>
 					<Text style={styles.postEmoji}>{post.emoji}</Text>
 				</View>
 
@@ -199,15 +256,6 @@ export default function PostsPage() {
 						<View style={styles.postRow}>
 							<Text style={styles.postLabel}>Activity:</Text>
 							<Text style={styles.postValue}>{post.activity}</Text>
-						</View>
-					)}
-
-					{post.rating && (
-						<View style={styles.postRow}>
-							<Text style={styles.postLabel}>Rating:</Text>
-							<Text style={styles.postValue}>
-								{"★".repeat(parseInt(post.rating))}
-							</Text>
 						</View>
 					)}
 
@@ -290,30 +338,31 @@ export default function PostsPage() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#25292e",
+		backgroundColor: colors.background,
 	},
 	header: {
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-		padding: 20,
+		padding: spacing.lg,
 		paddingTop: 60,
-		backgroundColor: "#25292e",
+		backgroundColor: colors.background,
 		borderBottomWidth: 1,
-		borderBottomColor: "#333",
+		borderBottomColor: colors.border,
 	},
 	backButton: {
-		padding: 10,
+		padding: spacing.sm,
 	},
 	backButtonText: {
-		color: "#4CAF50",
-		fontSize: 16,
-		fontWeight: "bold",
+		color: colors.primary,
+		fontSize: typography.bodyBold.fontSize,
+		fontWeight: typography.bodyBold.fontWeight,
 	},
 	headerTitle: {
-		color: "#fff",
-		fontSize: 20,
-		fontWeight: "bold",
+		color: colors.text,
+		fontSize: typography.h3.fontSize,
+		fontWeight: typography.h3.fontWeight,
+		letterSpacing: -0.5,
 	},
 	placeholder: {
 		width: 60,
@@ -325,84 +374,120 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		padding: 20,
+		padding: spacing.lg,
 	},
 	loadingText: {
-		color: "#fff",
-		fontSize: 16,
+		color: colors.text,
+		fontSize: typography.body.fontSize,
 	},
 	emptyContainer: {
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		padding: 20,
+		padding: spacing.lg,
 	},
 	emptyTitle: {
-		color: "#fff",
-		fontSize: 24,
-		fontWeight: "bold",
-		marginBottom: 10,
+		color: colors.text,
+		fontSize: typography.h2.fontSize,
+		fontWeight: typography.h2.fontWeight,
+		marginBottom: spacing.sm,
+		letterSpacing: -0.5,
 	},
 	emptyText: {
-		color: "#ccc",
-		fontSize: 16,
+		color: colors.textSecondary,
+		fontSize: typography.body.fontSize,
 		textAlign: "center",
-		marginBottom: 30,
+		marginBottom: spacing.xl,
+		lineHeight: 24,
 	},
 	createPostButton: {
-		backgroundColor: "#4CAF50",
-		padding: 15,
-		borderRadius: 8,
+		backgroundColor: colors.primary,
+		paddingVertical: spacing.md,
+		paddingHorizontal: spacing.lg,
+		borderRadius: borderRadius.md,
+		shadowColor: colors.primary,
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 8,
 	},
 	createPostButtonText: {
-		color: "#fff",
-		fontSize: 16,
-		fontWeight: "bold",
+		color: colors.white,
+		fontSize: typography.bodyBold.fontSize,
+		fontWeight: typography.bodyBold.fontWeight,
+		letterSpacing: 0.5,
 	},
 	postsContainer: {
-		padding: 20,
+		padding: spacing.lg,
 	},
-	postContainer: {
-		backgroundColor: "#333",
-		borderRadius: 12,
-		padding: 20,
-		marginBottom: 20,
+	postCard: {
+		backgroundColor: colors.surface,
+		borderRadius: borderRadius.lg,
+		padding: spacing.lg,
+		marginBottom: spacing.lg,
+		borderWidth: 1,
+		borderColor: colors.border,
+		shadowColor: colors.black,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 8,
+		elevation: 4,
 	},
 	postHeader: {
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
-		marginBottom: 15,
+		marginBottom: spacing.lg,
+	},
+	postTitleContainer: {
+		flex: 1,
+		flexDirection: "row",
+		alignItems: "center",
 	},
 	postTitle: {
-		color: "#fff",
-		fontSize: 24,
-		fontWeight: "bold",
+		color: colors.text,
+		fontSize: typography.h3.fontSize,
+		fontWeight: typography.h3.fontWeight,
+		marginRight: spacing.sm,
+		letterSpacing: -0.5,
+	},
+	ratingBadge: {
+		backgroundColor: colors.secondary,
+		paddingHorizontal: spacing.sm,
+		paddingVertical: spacing.xs,
+		borderRadius: borderRadius.full,
+	},
+	ratingText: {
+		color: colors.white,
+		fontSize: typography.small.fontSize,
+		fontWeight: "600",
 	},
 	postEmoji: {
 		fontSize: 32,
 	},
 	postContent: {
-		marginBottom: 15,
+		marginBottom: spacing.lg,
 	},
 	postRow: {
 		flexDirection: "row",
-		marginBottom: 8,
+		marginBottom: spacing.sm,
+		alignItems: "flex-start",
 	},
 	postLabel: {
-		color: "#ccc",
-		fontSize: 14,
-		fontWeight: "bold",
+		color: colors.textSecondary,
+		fontSize: typography.caption.fontSize,
+		fontWeight: typography.bodyBold.fontWeight,
 		width: 100,
 	},
 	postValue: {
-		color: "#fff",
-		fontSize: 14,
+		color: colors.text,
+		fontSize: typography.caption.fontSize,
 		flex: 1,
+		lineHeight: 20,
 	},
 	postDate: {
-		color: "#999",
-		fontSize: 12,
+		color: colors.textMuted,
+		fontSize: typography.small.fontSize,
 		fontStyle: "italic",
 		textAlign: "right",
 	},
