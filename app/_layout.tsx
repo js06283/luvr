@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { Redirect } from "expo-router";
+import { FormProvider } from "./forms/FormContext";
 
 export default function RootLayout() {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -20,13 +21,18 @@ export default function RootLayout() {
 	}
 
 	return (
-		<Stack screenOptions={{ headerShown: false }}>
-			{!isAuthenticated ? (
-				<Stack.Screen name="login" />
-			) : (
-				<Stack.Screen name="(tabs)" />
-			)}
-			<Stack.Screen name="+not-found" />
-		</Stack>
+		<FormProvider>
+			<Stack screenOptions={{ headerShown: false }}>
+				{!isAuthenticated ? (
+					<Stack.Screen name="login" />
+				) : (
+					<Stack.Screen name="(tabs)" />
+				)}
+				<Stack.Screen name="forms" />
+				<Stack.Screen name="people" />
+				<Stack.Screen name="dates" />
+				<Stack.Screen name="+not-found" />
+			</Stack>
+		</FormProvider>
 	);
 }

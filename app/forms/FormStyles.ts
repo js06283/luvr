@@ -375,4 +375,23 @@ export const formStyles = StyleSheet.create({
 		fontSize: typography.small.fontSize,
 		fontWeight: typography.captionBold.fontWeight,
 	},
+	colorContainer: {
+		marginBottom: spacing.xl,
+	},
+	emptyState: {
+		backgroundColor: colors.surface,
+		borderRadius: borderRadius.lg,
+		padding: spacing.xl,
+		alignItems: "center",
+		borderWidth: 1,
+		borderColor: colors.border,
+		marginBottom: spacing.lg,
+	},
+	emptyStateText: {
+		...typography.body,
+		color: colors.textSecondary,
+		textAlign: "center",
+		lineHeight: 24,
+		marginBottom: spacing.lg,
+	},
 });

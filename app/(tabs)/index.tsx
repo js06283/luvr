@@ -3,7 +3,7 @@
 // import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 // import { Link } from "expo-router";
 // import { app } from "../../firebaseConfig.js";
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
 	View,
 	Text,
@@ -12,6 +12,7 @@ import {
 	Alert,
 	StyleSheet,
 	ScrollView,
+	RefreshControl,
 } from "react-native";
 import {
 	getAuth,
@@ -20,6 +21,7 @@ import {
 } from "firebase/auth";
 import { app } from "../../firebaseConfig";
 import { router } from "expo-router";
+import { useFormData } from "../forms/FormContext";
 
 // Elegant color palette
 const colors = {
@@ -69,6 +71,14 @@ const borderRadius = {
 };
 
 export default function Home() {
+	const { formData, loadPeople, loadDates } = useFormData();
+
+	// Load data when component mounts
+	useEffect(() => {
+		loadPeople();
+		loadDates();
+	}, []);
+
 	const handleSignOut = async () => {
 		try {
 			await getAuth(app).signOut();
@@ -78,16 +88,43 @@ export default function Home() {
 		}
 	};
 
-	const handleViewAllPosts = () => {
-		router.push("/posts");
+	const handleViewPeople = () => {
+		router.push("/people");
 	};
 
-	const handleCreatePost = () => {
-		router.push("/forms/date");
+	const handleViewDates = () => {
+		router.push("/dates");
+	};
+
+	const handleAddPerson = () => {
+		router.push("/forms/person/name");
+	};
+
+	const handleAddDate = () => {
+		router.push("/forms/date/select-person");
+	};
+
+	const handleRefresh = async () => {
+		try {
+			await Promise.all([loadPeople(), loadDates()]);
+		} catch (error) {
+			console.error("Error refreshing data:", error);
+		}
 	};
 
 	return (
-		<ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+		<ScrollView
+			style={styles.container}
+			showsVerticalScrollIndicator={false}
+			refreshControl={
+				<RefreshControl
+					refreshing={formData.loading}
+					onRefresh={handleRefresh}
+					tintColor={colors.primary}
+					colors={[colors.primary]}
+				/>
+			}
+		>
 			<View style={styles.content}>
 				{/* Header Section */}
 				<View style={styles.headerSection}>
@@ -101,12 +138,12 @@ export default function Home() {
 				{/* Quick Stats */}
 				<View style={styles.statsContainer}>
 					<View style={styles.statCard}>
-						<Text style={styles.statNumber}>0</Text>
-						<Text style={styles.statLabel}>Your Posts</Text>
+						<Text style={styles.statNumber}>{formData.people.length}</Text>
+						<Text style={styles.statLabel}>People</Text>
 					</View>
 					<View style={styles.statCard}>
-						<Text style={styles.statNumber}>0</Text>
-						<Text style={styles.statLabel}>Total Posts</Text>
+						<Text style={styles.statNumber}>{formData.dates.length}</Text>
+						<Text style={styles.statLabel}>Dates</Text>
 					</View>
 				</View>
 
@@ -114,16 +151,30 @@ export default function Home() {
 				<View style={styles.actionsContainer}>
 					<TouchableOpacity
 						style={[styles.button, styles.primaryButton]}
-						onPress={handleCreatePost}
+						onPress={handleAddPerson}
 					>
-						<Text style={styles.buttonText}>Create New Post</Text>
+						<Text style={styles.buttonText}>Add a Person</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
 						style={[styles.button, styles.secondaryButton]}
-						onPress={handleViewAllPosts}
+						onPress={handleAddDate}
 					>
-						<Text style={styles.secondaryButtonText}>View All Posts</Text>
+						<Text style={styles.secondaryButtonText}>Add a Date</Text>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={[styles.button, styles.tertiaryButton]}
+						onPress={handleViewPeople}
+					>
+						<Text style={styles.tertiaryButtonText}>View People</Text>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={[styles.button, styles.outlineButton]}
+						onPress={handleViewDates}
+					>
+						<Text style={styles.outlineButtonText}>View Dates</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
@@ -137,11 +188,24 @@ export default function Home() {
 				{/* Recent Activity */}
 				<View style={styles.recentSection}>
 					<Text style={styles.sectionTitle}>Recent Activity</Text>
-					<View style={styles.emptyState}>
-						<Text style={styles.emptyStateText}>
-							No posts yet. Start by creating your first post!
-						</Text>
-					</View>
+					{formData.loading ? (
+						<View style={styles.emptyState}>
+							<Text style={styles.emptyStateText}>Loading...</Text>
+						</View>
+					) : formData.people.length === 0 && formData.dates.length === 0 ? (
+						<View style={styles.emptyState}>
+							<Text style={styles.emptyStateText}>
+								No activity yet. Start by adding people or dates!
+							</Text>
+						</View>
+					) : (
+						<View style={styles.emptyState}>
+							<Text style={styles.emptyStateText}>
+								{formData.people.length} people and {formData.dates.length}{" "}
+								dates in your collection
+							</Text>
+						</View>
+					)}
 				</View>
 			</View>
 		</ScrollView>
@@ -235,6 +299,14 @@ const styles = StyleSheet.create({
 		shadowRadius: 8,
 		elevation: 8,
 	},
+	tertiaryButton: {
+		backgroundColor: colors.secondary,
+		shadowColor: colors.secondary,
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 8,
+	},
 	outlineButton: {
 		backgroundColor: "transparent",
 		borderWidth: 1,
@@ -251,6 +323,11 @@ const styles = StyleSheet.create({
 		fontSize: typography.bodyBold.fontSize,
 		fontWeight: typography.bodyBold.fontWeight,
 		letterSpacing: 0.5,
+	},
+	tertiaryButtonText: {
+		color: colors.white,
+		fontSize: typography.bodyBold.fontSize,
+		fontWeight: typography.bodyBold.fontWeight,
 	},
 	outlineButtonText: {
 		color: colors.textSecondary,
