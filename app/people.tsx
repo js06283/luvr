@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	View,
 	Text,
@@ -9,34 +9,29 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useFormData } from "./forms/FormContext";
+import EditableField from "./components/EditableField";
 
-// Elegant color palette
+// New color palette from the design
 const colors = {
-	primary: "#6366f1",
-	primaryLight: "#818cf8",
-	primaryDark: "#4f46e5",
-	secondary: "#f59e0b",
-	background: "#0f172a",
-	surface: "#1e293b",
-	surfaceLight: "#334155",
-	text: "#f8fafc",
-	textSecondary: "#cbd5e1",
-	textMuted: "#64748b",
-	success: "#10b981",
-	error: "#ef4444",
-	border: "#334155",
+	background: "#FFFBF8", // A warm off-white
+	text: "#1E1E1E", // Dark charcoal
+	primary: "#D8D1E9", // Light Lavender
+	secondary: "#F5A895", // Coral/Salmon Pink
+	accent: "#8E9AAF", // Slate Blue/Gray
 	white: "#ffffff",
-	black: "#000000",
+	textSecondary: "#8E9AAF", // Using accent for secondary text
+	textMuted: "#B0B8C4", // A lighter gray for placeholders
+	border: "#EAEAEA", // A light gray for borders
 };
 
-// Typography scale
+// Typography scale (consistent with other screens)
 const typography = {
 	h1: { fontSize: 32, fontWeight: "700" as const },
 	h2: { fontSize: 28, fontWeight: "600" as const },
-	h3: { fontSize: 24, fontWeight: "600" as const },
+	h3: { fontSize: 22, fontWeight: "600" as const },
 	body: { fontSize: 16, fontWeight: "400" as const },
 	bodyBold: { fontSize: 16, fontWeight: "600" as const },
-	caption: { fontSize: 14, fontWeight: "400" as const },
+	caption: { fontSize: 12, fontWeight: "400" as const },
 };
 
 // Spacing scale
@@ -60,7 +55,8 @@ const borderRadius = {
 
 export default function PeoplePage() {
 	const router = useRouter();
-	const { formData, loadPeople } = useFormData();
+	const { formData, loadPeople, updatePerson } = useFormData();
+	const [editingPersonId, setEditingPersonId] = useState<string | null>(null);
 
 	// Load people when component mounts
 	useEffect(() => {
@@ -83,10 +79,117 @@ export default function PeoplePage() {
 		router.back();
 	};
 
+	const handleFieldUpdate = async (
+		personId: string,
+		field: string,
+		value: string
+	) => {
+		try {
+			await updatePerson(personId, { [field]: value });
+		} catch (error) {
+			console.error("Error updating person:", error);
+		}
+	};
+
+	const handleEditToggle = (personId: string) => {
+		setEditingPersonId(editingPersonId === personId ? null : personId);
+	};
+
 	const formatDate = (date: any) => {
 		if (!date) return "Unknown";
 		const dateObj = date.toDate ? date.toDate() : new Date(date);
 		return dateObj.toLocaleDateString();
+	};
+
+	const PersonCard = ({ person }: { person: any }) => {
+		const isEditing = editingPersonId === person.id;
+
+		return (
+			<View style={styles.personCard}>
+				{isEditing ? (
+					// Editable View
+					<View>
+						<View style={styles.editHeader}>
+							<Text style={styles.editTitle}>Editing {person.name}</Text>
+							<TouchableOpacity
+								style={styles.cancelEditButton}
+								onPress={() => handleEditToggle(person.id)}
+							>
+								<Text style={styles.cancelEditButtonText}>Cancel</Text>
+							</TouchableOpacity>
+						</View>
+
+						<View style={styles.editableFields}>
+							<EditableField
+								label="Name"
+								value={person.name}
+								onSave={(value) => handleFieldUpdate(person.id!, "name", value)}
+								placeholder="Enter name"
+								autoCapitalize="words"
+							/>
+
+							<EditableField
+								label="Age"
+								value={String(person.age)}
+								onSave={(value) => handleFieldUpdate(person.id!, "age", value)}
+								placeholder="Enter age"
+								keyboardType="number-pad"
+								autoCapitalize="none"
+							/>
+
+							<EditableField
+								label="Occupation"
+								value={person.industry}
+								onSave={(value) =>
+									handleFieldUpdate(person.id!, "industry", value)
+								}
+								placeholder="Enter occupation"
+								autoCapitalize="words"
+							/>
+
+							<EditableField
+								label="How did you meet?"
+								value={person.how_we_met}
+								onSave={(value) =>
+									handleFieldUpdate(person.id!, "how_we_met", value)
+								}
+								placeholder="Enter how you met"
+								autoCapitalize="words"
+							/>
+						</View>
+					</View>
+				) : (
+					// Static View
+					<View>
+						<View style={styles.personHeader}>
+							<Text style={styles.personName}>{person.name}</Text>
+							<View style={styles.ageBadge}>
+								<Text style={styles.ageText}>{person.age} years old</Text>
+							</View>
+						</View>
+
+						<View style={styles.personDetails}>
+							<Text style={styles.personDetail}>💼 {person.industry}</Text>
+							{person.how_we_met && (
+								<Text style={styles.personDetail}>🤝 {person.how_we_met}</Text>
+							)}
+						</View>
+
+						<View style={styles.cardFooter}>
+							<Text style={styles.personDate}>
+								Added on {formatDate(person.createdAt)}
+							</Text>
+							<TouchableOpacity
+								style={styles.editButton}
+								onPress={() => handleEditToggle(person.id)}
+							>
+								<Text style={styles.editButtonText}>Edit</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				)}
+			</View>
+		);
 	};
 
 	return (
@@ -118,12 +221,13 @@ export default function PeoplePage() {
 					</View>
 				) : formData.people.length === 0 ? (
 					<View style={styles.emptyState}>
+						<Text style={styles.emptyStateTitle}>No one here yet!</Text>
 						<Text style={styles.emptyStateText}>
-							No people added yet. Add your first person!
+							Add your first person to get started.
 						</Text>
 						<TouchableOpacity
-							style={styles.primaryButton}
 							onPress={handleAddPerson}
+							style={styles.primaryButton}
 						>
 							<Text style={styles.primaryButtonText}>Add a Person</Text>
 						</TouchableOpacity>
@@ -131,22 +235,7 @@ export default function PeoplePage() {
 				) : (
 					<View style={styles.peopleList}>
 						{formData.people.map((person) => (
-							<View key={person.id} style={styles.personCard}>
-								<View style={styles.personHeader}>
-									<Text style={styles.personName}>{person.name}</Text>
-									<View style={styles.eyeColorBadge}>
-										<Text style={styles.eyeColorText}>{person.eye_color}</Text>
-									</View>
-								</View>
-								<View style={styles.personDetails}>
-									<Text style={styles.personDetail}>📏 {person.height}</Text>
-									<Text style={styles.personDetail}>💼 {person.industry}</Text>
-									<Text style={styles.personDetail}>🏠 {person.home}</Text>
-								</View>
-								<Text style={styles.personDate}>
-									Added on {formatDate(person.createdAt)}
-								</Text>
-							</View>
+							<PersonCard key={person.id} person={person} />
 						))}
 					</View>
 				)}
@@ -167,6 +256,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: spacing.lg,
 		paddingTop: spacing.xl,
 		paddingBottom: spacing.lg,
+		backgroundColor: colors.white,
 		borderBottomWidth: 1,
 		borderBottomColor: colors.border,
 	},
@@ -175,7 +265,7 @@ const styles = StyleSheet.create({
 	},
 	backButtonText: {
 		...typography.bodyBold,
-		color: colors.primary,
+		color: colors.accent,
 	},
 	title: {
 		...typography.h2,
@@ -188,21 +278,30 @@ const styles = StyleSheet.create({
 	},
 	addButtonText: {
 		...typography.bodyBold,
-		color: colors.success,
+		color: colors.secondary,
+		fontSize: 18,
 	},
 	content: {
 		padding: spacing.lg,
 	},
 	emptyState: {
 		alignItems: "center",
+		justifyContent: "center",
 		paddingVertical: spacing.xxl,
+		marginTop: spacing.xxl,
+	},
+	emptyStateTitle: {
+		...typography.h3,
+		color: colors.text,
+		marginBottom: spacing.md,
 	},
 	emptyStateText: {
 		...typography.body,
 		color: colors.textSecondary,
 		textAlign: "center",
-		marginBottom: spacing.lg,
+		marginBottom: spacing.xl,
 		lineHeight: 24,
+		maxWidth: 300,
 	},
 	primaryButton: {
 		backgroundColor: colors.primary,
@@ -222,19 +321,43 @@ const styles = StyleSheet.create({
 		letterSpacing: 0.5,
 	},
 	peopleList: {
-		gap: spacing.md,
+		gap: spacing.lg,
 	},
 	personCard: {
-		backgroundColor: colors.surface,
+		backgroundColor: colors.white,
 		borderRadius: borderRadius.lg,
 		padding: spacing.lg,
 		borderWidth: 1,
 		borderColor: colors.border,
-		shadowColor: colors.black,
+		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
+		shadowOpacity: 0.05,
 		shadowRadius: 8,
 		elevation: 4,
+	},
+	editHeader: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: spacing.md,
+		paddingBottom: spacing.md,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.border,
+	},
+	editTitle: {
+		...typography.h3,
+		color: colors.text,
+	},
+	cancelEditButton: {
+		paddingVertical: spacing.xs,
+		paddingHorizontal: spacing.md,
+		backgroundColor: colors.secondary,
+		borderRadius: borderRadius.sm,
+	},
+	cancelEditButtonText: {
+		color: colors.white,
+		...typography.caption,
+		fontWeight: "600",
 	},
 	personHeader: {
 		flexDirection: "row",
@@ -247,28 +370,56 @@ const styles = StyleSheet.create({
 		color: colors.text,
 		flex: 1,
 	},
-	eyeColorBadge: {
-		backgroundColor: colors.primary,
-		paddingHorizontal: spacing.sm,
+	ageBadge: {
 		paddingVertical: spacing.xs,
+		paddingHorizontal: spacing.md,
 		borderRadius: borderRadius.full,
+		marginLeft: spacing.md,
+		backgroundColor: colors.primary,
 	},
-	eyeColorText: {
+	ageText: {
 		...typography.caption,
 		color: colors.white,
 		fontWeight: "600",
 	},
 	personDetails: {
-		marginBottom: spacing.md,
+		flexDirection: "row",
+		flexWrap: "wrap",
+		gap: spacing.md,
+		marginTop: spacing.sm,
+		paddingTop: spacing.md,
+		borderTopWidth: 1,
+		borderTopColor: colors.border,
 	},
 	personDetail: {
 		...typography.body,
 		color: colors.textSecondary,
-		marginBottom: spacing.xs,
+	},
+	cardFooter: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginTop: spacing.lg,
+		paddingTop: spacing.md,
+		borderTopWidth: 1,
+		borderTopColor: colors.border,
 	},
 	personDate: {
 		...typography.caption,
 		color: colors.textMuted,
-		fontStyle: "italic",
+	},
+	editButton: {
+		paddingVertical: spacing.xs,
+		paddingHorizontal: spacing.md,
+		backgroundColor: colors.primary,
+		borderRadius: borderRadius.sm,
+	},
+	editButtonText: {
+		color: colors.white,
+		...typography.caption,
+		fontWeight: "600",
+	},
+	editableFields: {
+		marginTop: spacing.md,
 	},
 });

@@ -1,30 +1,11 @@
-import React, { useState } from "react";
-import {
-	Text,
-	View,
-	TextInput,
-	TouchableOpacity,
-	ScrollView,
-} from "react-native";
-import { useRouter } from "expo-router";
+import React from "react";
+import { Text, View, TextInput, ScrollView } from "react-native";
 import { useFormData } from "../FormContext";
 import { formStyles } from "../FormStyles";
+import FormButtons from "../FormButtons";
 
 export default function PersonNamePage() {
-	const router = useRouter();
 	const { formData, updatePersonData } = useFormData();
-	const [name, setName] = useState(formData.currentPerson.name || "");
-
-	const handleNext = () => {
-		if (name.trim()) {
-			updatePersonData("name", name.trim());
-			router.push("/forms/person/height");
-		}
-	};
-
-	const handleReturnToHome = () => {
-		router.push("/(tabs)");
-	};
 
 	return (
 		<ScrollView
@@ -41,44 +22,25 @@ export default function PersonNamePage() {
 				<View style={formStyles.progressStep}>
 					<Text style={formStyles.progressStepTextInactive}>3</Text>
 				</View>
-				<View style={formStyles.progressStep}>
-					<Text style={formStyles.progressStepTextInactive}>4</Text>
-				</View>
-				<View style={formStyles.progressStep}>
-					<Text style={formStyles.progressStepTextInactive}>5</Text>
-				</View>
 			</View>
 
-			<Text style={formStyles.header}>What's their name?</Text>
-			<Text style={formStyles.subtitle}>
-				Enter the name of the person you want to add
-			</Text>
+			<Text style={formStyles.question}>What's their name?</Text>
 
 			<TextInput
 				style={formStyles.input}
 				placeholder="Enter their name"
-				placeholderTextColor="#64748b"
-				value={name}
-				onChangeText={setName}
+				placeholderTextColor={formStyles.inputPlaceholder.color}
+				value={formData.currentPerson.name}
+				onChangeText={(text) => updatePersonData("name", text)}
 				autoFocus
 				autoCapitalize="words"
-				autoCorrect={false}
 			/>
 
-			<TouchableOpacity
-				style={[formStyles.nextButton, !name.trim() && { opacity: 0.5 }]}
-				onPress={handleNext}
-				disabled={!name.trim()}
-			>
-				<Text style={formStyles.nextButtonText}>Next</Text>
-			</TouchableOpacity>
-
-			<TouchableOpacity
-				style={formStyles.homeButton}
-				onPress={handleReturnToHome}
-			>
-				<Text style={formStyles.homeButtonText}>Return to Home</Text>
-			</TouchableOpacity>
+			<FormButtons
+				nextScreen="person/age"
+				backScreen="(tabs)/about"
+				canProceed={formData.currentPerson.name.trim().length > 0}
+			/>
 		</ScrollView>
 	);
 }

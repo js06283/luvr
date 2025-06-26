@@ -53,12 +53,6 @@ export default function SelectPersonPage() {
 				<View style={formStyles.progressStep}>
 					<Text style={formStyles.progressStepTextInactive}>3</Text>
 				</View>
-				<View style={formStyles.progressStep}>
-					<Text style={formStyles.progressStepTextInactive}>4</Text>
-				</View>
-				<View style={formStyles.progressStep}>
-					<Text style={formStyles.progressStepTextInactive}>5</Text>
-				</View>
 			</View>
 
 			<Text style={formStyles.header}>Who did you go on a date with?</Text>
@@ -75,10 +69,10 @@ export default function SelectPersonPage() {
 						No people added yet. Add a person first!
 					</Text>
 					<TouchableOpacity
-						style={formStyles.button}
+						style={formStyles.nextButton}
 						onPress={() => router.push("/forms/person/name")}
 					>
-						<Text style={formStyles.buttonText}>Add a Person</Text>
+						<Text style={formStyles.nextButtonText}>Add a Person</Text>
 					</TouchableOpacity>
 				</View>
 			) : (
@@ -98,7 +92,8 @@ export default function SelectPersonPage() {
 									selectedPerson === person.id && formStyles.selectedOptionText,
 								]}
 							>
-								{person.name} - {person.height}, {person.industry}
+								{person.name} - {person.age} years old, {person.industry}
+								{person.how_we_met && ` • Met via ${person.how_we_met}`}
 							</Text>
 						</TouchableOpacity>
 					))}

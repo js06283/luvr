@@ -17,31 +17,27 @@ import {
 } from "firebase/auth";
 import { app } from "../firebaseConfig";
 import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
-// Elegant color palette
+// New color palette from the design
 const colors = {
-	primary: "#6366f1",
-	primaryLight: "#818cf8",
-	primaryDark: "#4f46e5",
-	secondary: "#f59e0b",
-	background: "#0f172a",
-	surface: "#1e293b",
-	surfaceLight: "#334155",
-	text: "#f8fafc",
-	textSecondary: "#cbd5e1",
-	textMuted: "#64748b",
-	success: "#10b981",
-	error: "#ef4444",
-	border: "#334155",
+	background: "#FFFBF8", // A warm off-white
+	text: "#1E1E1E", // Dark charcoal
+	primary: "#D8D1E9", // Light Lavender
+	secondary: "#F5A895", // Coral/Salmon Pink
+	accent: "#8E9AAF", // Slate Blue/Gray
 	white: "#ffffff",
-	black: "#000000",
+	textSecondary: "#8E9AAF", // Using accent for secondary text
+	textMuted: "#B0B8C4", // A lighter gray for placeholders
+	border: "#EAEAEA", // A light gray for borders
+	error: "#E57373", // A soft red for errors
 };
 
-// Typography scale
+// Typography scale (consistent with other screens)
 const typography = {
-	h1: { fontSize: 36, fontWeight: "700" as const },
+	h1: { fontSize: 48, fontWeight: "700" as const },
 	h2: { fontSize: 28, fontWeight: "600" as const },
-	h3: { fontSize: 24, fontWeight: "600" as const },
+	h3: { fontSize: 22, fontWeight: "600" as const },
 	body: { fontSize: 16, fontWeight: "400" as const },
 	bodyBold: { fontSize: 16, fontWeight: "600" as const },
 	caption: { fontSize: 14, fontWeight: "400" as const },
@@ -112,9 +108,7 @@ export default function Login() {
 					{/* App Logo/Title */}
 					<View style={styles.logoContainer}>
 						<Text style={styles.appTitle}>lolo</Text>
-						<Text style={styles.appSubtitle}>
-							Share your dating experiences
-						</Text>
+						<Text style={styles.appSubtitle}>Designed to Delight.</Text>
 					</View>
 
 					{/* Form Container */}
@@ -124,14 +118,13 @@ export default function Login() {
 						</Text>
 						<Text style={styles.subtitle}>
 							{isSignUp
-								? "Join our community and start sharing"
-								: "Sign in to continue your journey"}
+								? "Join our community and start sharing."
+								: "Sign in to continue your journey."}
 						</Text>
 
 						<View style={styles.inputContainer}>
-							<Text style={styles.inputLabel}>Email</Text>
 							<TextInput
-								placeholder="Enter your email"
+								placeholder="Email"
 								placeholderTextColor={colors.textMuted}
 								value={email}
 								onChangeText={setEmail}
@@ -143,9 +136,8 @@ export default function Login() {
 						</View>
 
 						<View style={styles.inputContainer}>
-							<Text style={styles.inputLabel}>Password</Text>
 							<TextInput
-								placeholder="Enter your password"
+								placeholder="Password"
 								placeholderTextColor={colors.textMuted}
 								value={password}
 								onChangeText={setPassword}
@@ -156,18 +148,25 @@ export default function Login() {
 							/>
 						</View>
 
-						<TouchableOpacity
-							onPress={handleAuth}
-							style={[styles.button, isLoading && styles.buttonDisabled]}
-							disabled={isLoading}
-						>
-							<Text style={styles.buttonText}>
-								{isLoading
-									? "Please wait..."
-									: isSignUp
-									? "Create Account"
-									: "Sign In"}
-							</Text>
+						<TouchableOpacity onPress={handleAuth} disabled={isLoading}>
+							<LinearGradient
+								colors={
+									isLoading
+										? [colors.accent, colors.textMuted]
+										: [colors.primary, colors.secondary]
+								}
+								start={{ x: 0, y: 0 }}
+								end={{ x: 1, y: 1 }}
+								style={styles.button}
+							>
+								<Text style={styles.buttonText}>
+									{isLoading
+										? "Please wait..."
+										: isSignUp
+										? "Create Account"
+										: "Sign In"}
+								</Text>
+							</LinearGradient>
 						</TouchableOpacity>
 
 						<TouchableOpacity
@@ -195,97 +194,88 @@ const styles = StyleSheet.create({
 	scrollContent: {
 		flexGrow: 1,
 		justifyContent: "center",
+		paddingVertical: spacing.xxl,
 	},
 	content: {
-		padding: spacing.lg,
+		paddingHorizontal: spacing.lg,
 	},
 	logoContainer: {
 		alignItems: "center",
-		marginBottom: spacing.xxl,
+		marginBottom: spacing.xl,
 	},
 	appTitle: {
 		...typography.h1,
-		color: colors.primary,
+		color: colors.text,
 		marginBottom: spacing.sm,
-		letterSpacing: -1,
+		fontFamily: "System", // Assuming a nice system font, can be replaced with a custom one
 	},
 	appSubtitle: {
-		...typography.caption,
+		...typography.body,
 		color: colors.textSecondary,
 		textAlign: "center",
 	},
 	formContainer: {
-		backgroundColor: colors.surface,
-		borderRadius: borderRadius.lg,
+		backgroundColor: colors.white,
+		borderRadius: borderRadius.xl,
 		padding: spacing.xl,
-		shadowColor: colors.black,
+		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.1,
-		shadowRadius: 12,
+		shadowOpacity: 0.08,
+		shadowRadius: 16,
 		elevation: 8,
+		marginTop: spacing.xl,
 	},
 	title: {
 		...typography.h2,
 		color: colors.text,
 		textAlign: "center",
 		marginBottom: spacing.sm,
-		letterSpacing: -0.5,
 	},
 	subtitle: {
-		...typography.caption,
+		...typography.body,
 		color: colors.textSecondary,
 		textAlign: "center",
 		marginBottom: spacing.xl,
-		lineHeight: 20,
+		lineHeight: 22,
 	},
 	inputContainer: {
-		marginBottom: spacing.lg,
-	},
-	inputLabel: {
-		...typography.bodyBold,
-		color: colors.text,
-		marginBottom: spacing.sm,
+		marginBottom: spacing.md,
 	},
 	input: {
-		backgroundColor: colors.surfaceLight,
-		borderWidth: 1,
-		borderColor: colors.border,
+		backgroundColor: colors.background,
 		borderRadius: borderRadius.md,
-		padding: spacing.md,
+		paddingVertical: spacing.md,
+		paddingHorizontal: spacing.lg,
 		fontSize: typography.body.fontSize,
 		color: colors.text,
-		minHeight: 56,
+		borderWidth: 1,
+		borderColor: colors.border,
 	},
 	button: {
-		backgroundColor: colors.primary,
-		paddingVertical: spacing.md,
 		borderRadius: borderRadius.md,
+		paddingVertical: spacing.lg,
 		alignItems: "center",
-		marginTop: spacing.lg,
-		minHeight: 56,
-		justifyContent: "center",
+		marginTop: spacing.md,
 		shadowColor: colors.primary,
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
-		elevation: 8,
-	},
-	buttonDisabled: {
-		opacity: 0.6,
+		elevation: 6,
 	},
 	buttonText: {
+		...typography.bodyBold,
 		color: colors.white,
-		fontSize: typography.bodyBold.fontSize,
-		fontWeight: typography.bodyBold.fontWeight,
-		letterSpacing: 0.5,
+		textShadowColor: "rgba(0, 0, 0, 0.2)",
+		textShadowOffset: { width: 0, height: 1 },
+		textShadowRadius: 2,
 	},
 	switchButton: {
 		marginTop: spacing.lg,
 		alignItems: "center",
 	},
 	switchText: {
-		color: colors.primary,
-		fontSize: typography.caption.fontSize,
-		textDecorationLine: "underline",
+		...typography.caption,
+		color: colors.secondary,
+		fontWeight: "600",
 	},
 });

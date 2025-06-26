@@ -14,9 +14,23 @@ export default function FormsLayout() {
 					}}
 				/>
 				<Stack.Screen
+					name="activity-location-time"
+					options={{
+						title: "Activity Location Time",
+						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
 					name="name"
 					options={{
 						title: "Name",
+						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
+					name="age"
+					options={{
+						title: "Age",
 						headerShown: false,
 					}}
 				/>

@@ -10,33 +10,27 @@ import {
 import { useRouter } from "expo-router";
 import { useFormData } from "./forms/FormContext";
 
-// Elegant color palette
+// New color palette from the design
 const colors = {
-	primary: "#6366f1",
-	primaryLight: "#818cf8",
-	primaryDark: "#4f46e5",
-	secondary: "#f59e0b",
-	background: "#0f172a",
-	surface: "#1e293b",
-	surfaceLight: "#334155",
-	text: "#f8fafc",
-	textSecondary: "#cbd5e1",
-	textMuted: "#64748b",
-	success: "#10b981",
-	error: "#ef4444",
-	border: "#334155",
+	background: "#FFFBF8", // A warm off-white
+	text: "#1E1E1E", // Dark charcoal
+	primary: "#D8D1E9", // Light Lavender
+	secondary: "#F5A895", // Coral/Salmon Pink
+	accent: "#8E9AAF", // Slate Blue/Gray
 	white: "#ffffff",
-	black: "#000000",
+	textSecondary: "#8E9AAF", // Using accent for secondary text
+	textMuted: "#B0B8C4", // A lighter gray for placeholders
+	border: "#EAEAEA", // A light gray for borders
 };
 
-// Typography scale
+// Typography scale (consistent with other screens)
 const typography = {
 	h1: { fontSize: 32, fontWeight: "700" as const },
 	h2: { fontSize: 28, fontWeight: "600" as const },
-	h3: { fontSize: 24, fontWeight: "600" as const },
+	h3: { fontSize: 22, fontWeight: "600" as const },
 	body: { fontSize: 16, fontWeight: "400" as const },
 	bodyBold: { fontSize: 16, fontWeight: "600" as const },
-	caption: { fontSize: 14, fontWeight: "400" as const },
+	caption: { fontSize: 12, fontWeight: "400" as const },
 };
 
 // Spacing scale
@@ -118,12 +112,13 @@ export default function DatesPage() {
 					</View>
 				) : formData.dates.length === 0 ? (
 					<View style={styles.emptyState}>
+						<Text style={styles.emptyStateTitle}>No dates yet!</Text>
 						<Text style={styles.emptyStateText}>
-							No dates added yet. Add your first date!
+							Record your first date to see it here.
 						</Text>
 						<TouchableOpacity
-							style={styles.primaryButton}
 							onPress={handleAddDate}
+							style={styles.primaryButton}
 						>
 							<Text style={styles.primaryButtonText}>Add a Date</Text>
 						</TouchableOpacity>
@@ -134,43 +129,52 @@ export default function DatesPage() {
 							<View key={date.id} style={styles.dateCard}>
 								<View style={styles.dateHeader}>
 									<Text style={styles.personName}>{date.personName}</Text>
-									<Text style={styles.dateText}>{date.date}</Text>
+									<Text style={styles.dateText}>
+										{new Date(date.date).toLocaleDateString()}
+									</Text>
 								</View>
 								<View style={styles.dateDetails}>
 									{date.activity && (
-										<Text style={styles.dateDetail}>
-											🎯 Activity: {date.activity}
-										</Text>
+										<View style={styles.tag}>
+											<Text style={styles.tagText}>🎯 {date.activity}</Text>
+										</View>
+									)}
+									{date.location && (
+										<View style={styles.tag}>
+											<Text style={styles.tagText}>📍 {date.location}</Text>
+										</View>
+									)}
+									{date.time_of_day && (
+										<View style={styles.tag}>
+											<Text style={styles.tagText}>🕐 {date.time_of_day}</Text>
+										</View>
 									)}
 									{date.rating && (
-										<Text style={styles.dateDetail}>
-											⭐ Rating: {date.rating}/5
-										</Text>
+										<View style={styles.tag}>
+											<Text style={styles.tagText}>⭐ {date.rating}/5</Text>
+										</View>
 									)}
 									{date.emoji && (
-										<Text style={styles.dateDetail}>
-											{date.emoji} Overall feeling
-										</Text>
-									)}
-									{date.icks && (
-										<Text style={styles.dateDetail}>😬 Icks: {date.icks}</Text>
-									)}
-									{date.liked && (
-										<Text style={styles.dateDetail}>
-											❤️ Liked: {date.liked}
-										</Text>
-									)}
-									{date.mutuals && (
-										<Text style={styles.dateDetail}>
-											🤝 Mutuals: {date.mutuals}
-										</Text>
+										<View style={styles.tag}>
+											<Text style={styles.tagText}>{date.emoji}</Text>
+										</View>
 									)}
 									{date.how_we_met && (
-										<Text style={styles.dateDetail}>
-											👋 How we met: {date.how_we_met}
-										</Text>
+										<View style={styles.tag}>
+											<Text style={styles.tagText}>👋 {date.how_we_met}</Text>
+										</View>
 									)}
 								</View>
+								{(date.liked || date.icks) && (
+									<View style={styles.notesSection}>
+										{date.liked && (
+											<Text style={styles.noteText}>❤️ {date.liked}</Text>
+										)}
+										{date.icks && (
+											<Text style={styles.noteText}>😬 {date.icks}</Text>
+										)}
+									</View>
+								)}
 								<Text style={styles.dateAdded}>
 									Added on {formatDate(date.createdAt)}
 								</Text>
@@ -195,6 +199,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: spacing.lg,
 		paddingTop: spacing.xl,
 		paddingBottom: spacing.lg,
+		backgroundColor: colors.white,
 		borderBottomWidth: 1,
 		borderBottomColor: colors.border,
 	},
@@ -203,7 +208,7 @@ const styles = StyleSheet.create({
 	},
 	backButtonText: {
 		...typography.bodyBold,
-		color: colors.primary,
+		color: colors.accent,
 	},
 	title: {
 		...typography.h2,
@@ -216,21 +221,30 @@ const styles = StyleSheet.create({
 	},
 	addButtonText: {
 		...typography.bodyBold,
-		color: colors.success,
+		color: colors.secondary,
+		fontSize: 18,
 	},
 	content: {
 		padding: spacing.lg,
 	},
 	emptyState: {
 		alignItems: "center",
+		justifyContent: "center",
 		paddingVertical: spacing.xxl,
+		marginTop: spacing.xxl,
+	},
+	emptyStateTitle: {
+		...typography.h3,
+		color: colors.text,
+		marginBottom: spacing.md,
 	},
 	emptyStateText: {
 		...typography.body,
 		color: colors.textSecondary,
 		textAlign: "center",
-		marginBottom: spacing.lg,
+		marginBottom: spacing.xl,
 		lineHeight: 24,
+		maxWidth: 300,
 	},
 	primaryButton: {
 		backgroundColor: colors.primary,
@@ -250,17 +264,17 @@ const styles = StyleSheet.create({
 		letterSpacing: 0.5,
 	},
 	datesList: {
-		gap: spacing.md,
+		gap: spacing.lg,
 	},
 	dateCard: {
-		backgroundColor: colors.surface,
+		backgroundColor: colors.white,
 		borderRadius: borderRadius.lg,
 		padding: spacing.lg,
 		borderWidth: 1,
 		borderColor: colors.border,
-		shadowColor: colors.black,
+		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
+		shadowOpacity: 0.05,
 		shadowRadius: 8,
 		elevation: 4,
 	},
@@ -269,6 +283,9 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		alignItems: "center",
 		marginBottom: spacing.md,
+		paddingBottom: spacing.md,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.border,
 	},
 	personName: {
 		...typography.h3,
@@ -276,20 +293,45 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	dateText: {
-		...typography.bodyBold,
-		color: colors.secondary,
+		...typography.caption,
+		color: colors.textSecondary,
+		fontWeight: "600",
 	},
 	dateDetails: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		gap: spacing.sm,
 		marginBottom: spacing.md,
 	},
-	dateDetail: {
-		...typography.body,
+	tag: {
+		backgroundColor: colors.background,
+		borderRadius: borderRadius.full,
+		paddingVertical: spacing.xs,
+		paddingHorizontal: spacing.md,
+		borderWidth: 1,
+		borderColor: colors.border,
+	},
+	tagText: {
+		...typography.caption,
 		color: colors.textSecondary,
-		marginBottom: spacing.xs,
+		fontWeight: "500",
+	},
+	notesSection: {
+		marginTop: spacing.sm,
+		paddingTop: spacing.md,
+		borderTopWidth: 1,
+		borderTopColor: colors.border,
+		gap: spacing.sm,
+	},
+	noteText: {
+		...typography.body,
+		color: colors.text,
+		lineHeight: 22,
 	},
 	dateAdded: {
 		...typography.caption,
 		color: colors.textMuted,
-		fontStyle: "italic",
+		marginTop: spacing.lg,
+		textAlign: "right",
 	},
 });

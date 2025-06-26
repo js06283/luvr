@@ -13,17 +13,17 @@ import {
 	getDocs,
 	query,
 	where,
+	doc,
+	updateDoc,
 } from "firebase/firestore";
 import { app } from "../../firebaseConfig";
 
 interface PersonData {
 	id?: string;
 	name: string;
-	height: string;
-	industry: string;
-	home: string;
-	hair_color: string;
-	eye_color: string;
+	age: string;
+	industry: string; // "What they do"
+	how_we_met: string; // "How did you meet"
 	createdAt?: any;
 	authorId?: string;
 }
@@ -36,6 +36,8 @@ interface DateData {
 	date_num: string;
 	how_we_met: string;
 	activity: string;
+	location: string;
+	time_of_day: string;
 	rating: string;
 	emoji: string;
 	icks: string;
@@ -62,7 +64,12 @@ interface FormContextType {
 	formData: FormData;
 	updatePersonData: (field: keyof PersonData, value: string) => void;
 	updateDateData: (field: keyof DateData, value: string) => void;
-	addPerson: (person: PersonData) => Promise<void>;
+	addPerson: (person: PersonData) => Promise<string | undefined>;
+	updatePerson: (
+		personId: string,
+		personData: Partial<PersonData>
+	) => Promise<void>;
+	setCurrentPersonById: (personId: string) => void;
 	addDate: (date: DateData) => Promise<void>;
 	loadPeople: () => Promise<void>;
 	loadDates: () => Promise<void>;
@@ -89,11 +96,9 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 	const [formData, setFormData] = useState<FormData>({
 		currentPerson: {
 			name: "",
-			height: "",
+			age: "",
 			industry: "",
-			home: "",
-			hair_color: "",
-			eye_color: "",
+			how_we_met: "",
 		},
 		currentDate: {
 			personId: "",
@@ -102,6 +107,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 			date_num: "",
 			how_we_met: "",
 			activity: "",
+			location: "",
+			time_of_day: "",
 			rating: "",
 			emoji: "",
 			icks: "",
@@ -144,7 +151,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 		}));
 	};
 
-	const addPerson = async (person: PersonData) => {
+	const addPerson = async (person: PersonData): Promise<string | undefined> => {
 		if (!auth.currentUser) return;
 
 		try {
@@ -165,10 +172,40 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 			setFormData((prev) => ({
 				...prev,
 				people: [...prev.people, newPerson],
+				currentPerson: newPerson,
+				loading: false,
+			}));
+			return docRef.id;
+		} catch (error) {
+			console.error("Error adding person:", error);
+			setFormData((prev) => ({ ...prev, loading: false }));
+		}
+	};
+
+	const updatePerson = async (
+		personId: string,
+		personData: Partial<PersonData>
+	) => {
+		if (!auth.currentUser) return;
+
+		try {
+			setFormData((prev) => ({ ...prev, loading: true }));
+			const personRef = doc(db, "people", personId);
+			await updateDoc(personRef, personData);
+
+			// Update local state
+			const updatedPeople = formData.people.map((p) =>
+				p.id === personId ? { ...p, ...personData } : p
+			);
+
+			setFormData((prev) => ({
+				...prev,
+				people: updatedPeople,
+				currentPerson: { ...prev.currentPerson, ...personData },
 				loading: false,
 			}));
 		} catch (error) {
-			console.error("Error adding person:", error);
+			console.error("Error updating person:", error);
 			setFormData((prev) => ({ ...prev, loading: false }));
 		}
 	};
@@ -207,30 +244,27 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 
 		try {
 			setFormData((prev) => ({ ...prev, loading: true }));
-
-			const peopleRef = collection(db, "people");
-			const q = query(peopleRef, where("authorId", "==", auth.currentUser.uid));
-
+			const q = query(
+				collection(db, "people"),
+				where("authorId", "==", auth.currentUser.uid)
+			);
 			const querySnapshot = await getDocs(q);
-			const peopleData: PersonData[] = [];
-
-			querySnapshot.forEach((doc) => {
-				peopleData.push({
+			const peopleList: PersonData[] = querySnapshot.docs.map((doc) => {
+				const data = doc.data();
+				return {
 					id: doc.id,
-					...doc.data(),
-				} as PersonData);
+					name: data.name || "",
+					age: String(data.age || ""), // Ensure age is always a string
+					industry: data.industry || "",
+					how_we_met: data.how_we_met || "",
+					createdAt: data.createdAt?.toDate(),
+					authorId: data.authorId,
+					authorEmail: data.authorEmail,
+				};
 			});
-
-			// Sort by createdAt in JavaScript
-			peopleData.sort((a, b) => {
-				const dateA = a.createdAt?.toDate?.() || a.createdAt || new Date(0);
-				const dateB = b.createdAt?.toDate?.() || b.createdAt || new Date(0);
-				return dateB.getTime() - dateA.getTime();
-			});
-
 			setFormData((prev) => ({
 				...prev,
-				people: peopleData,
+				people: peopleList,
 				loading: false,
 			}));
 		} catch (error) {
@@ -276,16 +310,24 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 		}
 	};
 
+	const setCurrentPersonById = (personId: string) => {
+		const person = formData.people.find((p) => p.id === personId);
+		if (person) {
+			setFormData((prev) => ({
+				...prev,
+				currentPerson: person,
+			}));
+		}
+	};
+
 	const clearPersonData = () => {
 		setFormData((prev) => ({
 			...prev,
 			currentPerson: {
 				name: "",
-				height: "",
+				age: "",
 				industry: "",
-				home: "",
-				hair_color: "",
-				eye_color: "",
+				how_we_met: "",
 			},
 		}));
 	};
@@ -300,6 +342,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 				date_num: "",
 				how_we_met: "",
 				activity: "",
+				location: "",
+				time_of_day: "",
 				rating: "",
 				emoji: "",
 				icks: "",
@@ -313,11 +357,9 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 		setFormData({
 			currentPerson: {
 				name: "",
-				height: "",
+				age: "",
 				industry: "",
-				home: "",
-				hair_color: "",
-				eye_color: "",
+				how_we_met: "",
 			},
 			currentDate: {
 				personId: "",
@@ -326,6 +368,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 				date_num: "",
 				how_we_met: "",
 				activity: "",
+				location: "",
+				time_of_day: "",
 				rating: "",
 				emoji: "",
 				icks: "",
@@ -345,6 +389,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
 				updatePersonData,
 				updateDateData,
 				addPerson,
+				updatePerson,
+				setCurrentPersonById,
 				addDate,
 				loadPeople,
 				loadDates,

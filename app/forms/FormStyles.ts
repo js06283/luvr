@@ -2,23 +2,23 @@ import { StyleSheet } from "react-native";
 
 // Elegant color palette
 const colors = {
-	primary: "#6366f1", // Modern indigo
-	primaryLight: "#818cf8",
-	primaryDark: "#4f46e5",
-	secondary: "#f59e0b", // Warm amber
-	secondaryLight: "#fbbf24",
-	secondaryDark: "#d97706",
-	background: "#0f172a", // Deep slate
-	surface: "#1e293b", // Lighter slate
-	surfaceLight: "#334155",
-	text: "#f8fafc", // Light gray
-	textSecondary: "#cbd5e1",
-	textMuted: "#64748b",
+	primary: "#D8D1E9", // Light Lavender
+	primaryLight: "#E8E1F9",
+	primaryDark: "#C8C1D9",
+	secondary: "#F5A895", // Coral/Salmon Pink
+	secondaryLight: "#F5B8A5",
+	secondaryDark: "#E59885",
+	background: "#FFFBF8", // Warm off-white
+	surface: "#ffffff", // White
+	surfaceLight: "#F8F5F2",
+	text: "#1E1E1E", // Dark charcoal
+	textSecondary: "#8E9AAF", // Slate Blue/Gray
+	textMuted: "#B0B8C4", // Light gray
 	success: "#10b981", // Emerald
 	error: "#ef4444", // Red
 	warning: "#f59e0b", // Amber
-	border: "#334155",
-	borderLight: "#475569",
+	border: "#EAEAEA", // Light gray
+	borderLight: "#F0F0F0",
 	white: "#ffffff",
 	black: "#000000",
 };
@@ -78,6 +78,12 @@ export const formStyles = StyleSheet.create({
 		marginBottom: spacing.xl,
 		lineHeight: 24,
 	},
+	question: {
+		...typography.h3,
+		color: colors.text,
+		textAlign: "center",
+		marginBottom: spacing.xl,
+	},
 	input: {
 		backgroundColor: colors.surface,
 		borderWidth: 1,
@@ -97,7 +103,14 @@ export const formStyles = StyleSheet.create({
 	inputPlaceholder: {
 		color: colors.textMuted,
 	},
+	buttonContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginTop: spacing.xl,
+		gap: spacing.md,
+	},
 	button: {
+		flex: 1,
 		backgroundColor: colors.primary,
 		paddingVertical: spacing.md,
 		paddingHorizontal: spacing.lg,
@@ -111,6 +124,12 @@ export const formStyles = StyleSheet.create({
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
 		elevation: 8,
+	},
+	buttonDisabled: {
+		backgroundColor: colors.surfaceLight,
+		opacity: 0.6,
+		shadowColor: "transparent",
+		elevation: 0,
 	},
 	buttonPressed: {
 		backgroundColor: colors.primaryDark,
@@ -393,5 +412,42 @@ export const formStyles = StyleSheet.create({
 		textAlign: "center",
 		lineHeight: 24,
 		marginBottom: spacing.lg,
+	},
+	summaryContainer: {
+		backgroundColor: colors.surface,
+		borderRadius: borderRadius.lg,
+		padding: spacing.lg,
+		marginBottom: spacing.xl,
+		borderWidth: 1,
+		borderColor: colors.border,
+	},
+	summaryItem: {
+		paddingVertical: spacing.md,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.border,
+	},
+	summaryLabel: {
+		...typography.caption,
+		color: colors.textSecondary,
+		marginBottom: spacing.xs,
+		textTransform: "uppercase",
+		letterSpacing: 0.5,
+	},
+	summaryValue: {
+		...typography.body,
+		color: colors.text,
+		marginBottom: spacing.lg,
+	},
+	summaryInput: {
+		...typography.body,
+		color: colors.text,
+		paddingVertical: spacing.sm,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.border,
+		marginBottom: spacing.lg,
+	},
+	disclaimer: {
+		...typography.small,
+		color: colors.textMuted,
 	},
 });

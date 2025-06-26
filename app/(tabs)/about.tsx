@@ -7,27 +7,23 @@ import {
 	ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { formStyles } from "../forms/FormStyles";
 
-// Elegant color palette
+// Import colors and typography from FormStyles
 const colors = {
-	primary: "#6366f1",
-	primaryLight: "#818cf8",
-	primaryDark: "#4f46e5",
-	secondary: "#f59e0b",
-	background: "#0f172a",
-	surface: "#1e293b",
-	surfaceLight: "#334155",
-	text: "#f8fafc",
-	textSecondary: "#cbd5e1",
-	textMuted: "#64748b",
-	success: "#10b981",
-	error: "#ef4444",
-	border: "#334155",
+	background: "#FFFBF8", // A warm off-white
+	text: "#1E1E1E", // Dark charcoal
+	primary: "#D8D1E9", // Light Lavender
+	secondary: "#F5A895", // Coral/Salmon Pink
+	accent: "#8E9AAF", // Slate Blue/Gray
 	white: "#ffffff",
-	black: "#000000",
+	textSecondary: "#8E9AAF", // Using accent for secondary text
+	textMuted: "#B0B8C4", // A lighter gray for placeholders
+	border: "#EAEAEA", // A light gray for borders
+	surface: "#ffffff", // White surface
+	success: "#10b981", // Emerald
 };
 
-// Typography scale
 const typography = {
 	h1: { fontSize: 32, fontWeight: "700" as const },
 	h2: { fontSize: 28, fontWeight: "600" as const },
@@ -37,7 +33,6 @@ const typography = {
 	caption: { fontSize: 14, fontWeight: "400" as const },
 };
 
-// Spacing scale
 const spacing = {
 	xs: 4,
 	sm: 8,
@@ -47,12 +42,12 @@ const spacing = {
 	xxl: 48,
 };
 
-// Border radius
 const borderRadius = {
 	sm: 6,
 	md: 12,
 	lg: 16,
 	xl: 24,
+	full: 9999,
 };
 
 export default function CreatePostScreen() {
@@ -79,10 +74,7 @@ export default function CreatePostScreen() {
 			</View>
 
 			<View style={styles.actionsContainer}>
-				<TouchableOpacity
-					style={[styles.button, styles.primaryButton]}
-					onPress={handleAddPerson}
-				>
+				<TouchableOpacity onPress={handleAddPerson} style={styles.button}>
 					<Text style={styles.buttonText}>Add a Person</Text>
 					<Text style={styles.buttonSubtext}>
 						Add someone new to your collection
@@ -90,10 +82,10 @@ export default function CreatePostScreen() {
 				</TouchableOpacity>
 
 				<TouchableOpacity
-					style={[styles.button, styles.secondaryButton]}
 					onPress={handleAddDate}
+					style={styles.buttonSecondary}
 				>
-					<Text style={styles.secondaryButtonText}>Add a Date</Text>
+					<Text style={styles.buttonText}>Add a Date</Text>
 					<Text style={styles.buttonSubtext}>Record a date with someone</Text>
 				</TouchableOpacity>
 			</View>
@@ -104,6 +96,7 @@ export default function CreatePostScreen() {
 					<Text style={styles.infoStep}>1. Add People</Text>
 					<Text style={styles.infoDescription}>
 						Start by adding people to your collection with their basic details
+						(name, age, occupation)
 					</Text>
 				</View>
 				<View style={styles.infoCard}>
@@ -128,47 +121,48 @@ const styles = StyleSheet.create({
 		paddingBottom: spacing.xxl,
 	},
 	headerSection: {
-		alignItems: "center",
-		marginBottom: spacing.xxl,
-		marginTop: spacing.xl,
+		marginBottom: spacing.xl,
 	},
 	header: {
-		...typography.h1,
+		...typography.h2,
 		color: colors.text,
-		marginBottom: spacing.sm,
 		textAlign: "center",
-		letterSpacing: -1,
+		marginBottom: spacing.sm,
+		letterSpacing: -0.5,
 	},
 	subtitle: {
 		...typography.body,
 		color: colors.textSecondary,
 		textAlign: "center",
 		lineHeight: 24,
-		paddingHorizontal: spacing.md,
 	},
 	actionsContainer: {
-		marginBottom: spacing.xxl,
+		gap: spacing.lg,
+		marginBottom: spacing.xl,
 	},
 	button: {
-		paddingVertical: spacing.lg,
+		backgroundColor: colors.primary,
+		paddingVertical: spacing.md,
 		paddingHorizontal: spacing.lg,
-		borderRadius: borderRadius.lg,
+		borderRadius: borderRadius.md,
 		alignItems: "center",
-		marginBottom: spacing.lg,
 		minHeight: 80,
 		justifyContent: "center",
-	},
-	primaryButton: {
-		backgroundColor: colors.primary,
 		shadowColor: colors.primary,
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
 		elevation: 8,
 	},
-	secondaryButton: {
-		backgroundColor: colors.success,
-		shadowColor: colors.success,
+	buttonSecondary: {
+		backgroundColor: colors.secondary,
+		paddingVertical: spacing.md,
+		paddingHorizontal: spacing.lg,
+		borderRadius: borderRadius.md,
+		alignItems: "center",
+		minHeight: 80,
+		justifyContent: "center",
+		shadowColor: colors.secondary,
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
@@ -176,26 +170,19 @@ const styles = StyleSheet.create({
 	},
 	buttonText: {
 		color: colors.white,
-		fontSize: typography.h3.fontSize,
-		fontWeight: typography.h3.fontWeight,
-		letterSpacing: 0.5,
-		marginBottom: spacing.xs,
-	},
-	secondaryButtonText: {
-		color: colors.white,
-		fontSize: typography.h3.fontSize,
-		fontWeight: typography.h3.fontWeight,
+		fontSize: typography.bodyBold.fontSize,
+		fontWeight: typography.bodyBold.fontWeight,
 		letterSpacing: 0.5,
 		marginBottom: spacing.xs,
 	},
 	buttonSubtext: {
-		color: colors.textSecondary,
+		color: colors.white,
 		fontSize: typography.caption.fontSize,
+		opacity: 0.9,
 		textAlign: "center",
-		opacity: 0.8,
 	},
 	infoSection: {
-		marginBottom: spacing.lg,
+		marginTop: spacing.xl,
 	},
 	infoTitle: {
 		...typography.h3,
@@ -205,7 +192,7 @@ const styles = StyleSheet.create({
 	},
 	infoCard: {
 		backgroundColor: colors.surface,
-		borderRadius: borderRadius.lg,
+		borderRadius: borderRadius.md,
 		padding: spacing.lg,
 		marginBottom: spacing.md,
 		borderWidth: 1,
@@ -213,12 +200,12 @@ const styles = StyleSheet.create({
 	},
 	infoStep: {
 		...typography.bodyBold,
-		color: colors.primary,
-		marginBottom: spacing.xs,
+		color: colors.text,
+		marginBottom: spacing.sm,
 	},
 	infoDescription: {
 		...typography.body,
 		color: colors.textSecondary,
-		lineHeight: 22,
+		lineHeight: 24,
 	},
 });

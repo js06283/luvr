@@ -22,31 +22,26 @@ import {
 import { app } from "../../firebaseConfig";
 import { router } from "expo-router";
 import { useFormData } from "../forms/FormContext";
+import { LinearGradient } from "expo-linear-gradient";
 
-// Elegant color palette
+// New color palette from the design
 const colors = {
-	primary: "#6366f1",
-	primaryLight: "#818cf8",
-	primaryDark: "#4f46e5",
-	secondary: "#f59e0b",
-	background: "#0f172a",
-	surface: "#1e293b",
-	surfaceLight: "#334155",
-	text: "#f8fafc",
-	textSecondary: "#cbd5e1",
-	textMuted: "#64748b",
-	success: "#10b981",
-	error: "#ef4444",
-	border: "#334155",
+	background: "#FFFBF8", // A warm off-white
+	text: "#1E1E1E", // Dark charcoal
+	primary: "#D8D1E9", // Light Lavender
+	secondary: "#F5A895", // Coral/Salmon Pink
+	accent: "#8E9AAF", // Slate Blue/Gray
 	white: "#ffffff",
-	black: "#000000",
+	textSecondary: "#8E9AAF", // Using accent for secondary text
+	border: "#EAEAEA", // A light gray for borders
+	error: "#E57373", // A soft red for errors
 };
 
 // Typography scale
 const typography = {
-	h1: { fontSize: 32, fontWeight: "700" as const },
+	h1: { fontSize: 48, fontWeight: "700" as const },
 	h2: { fontSize: 28, fontWeight: "600" as const },
-	h3: { fontSize: 24, fontWeight: "600" as const },
+	h3: { fontSize: 22, fontWeight: "600" as const },
 	body: { fontSize: 16, fontWeight: "400" as const },
 	bodyBold: { fontSize: 16, fontWeight: "600" as const },
 	caption: { fontSize: 14, fontWeight: "400" as const },
@@ -96,14 +91,6 @@ export default function Home() {
 		router.push("/dates");
 	};
 
-	const handleAddPerson = () => {
-		router.push("/forms/person/name");
-	};
-
-	const handleAddDate = () => {
-		router.push("/forms/date/select-person");
-	};
-
 	const handleRefresh = async () => {
 		try {
 			await Promise.all([loadPeople(), loadDates()]);
@@ -120,8 +107,7 @@ export default function Home() {
 				<RefreshControl
 					refreshing={formData.loading}
 					onRefresh={handleRefresh}
-					tintColor={colors.primary}
-					colors={[colors.primary]}
+					tintColor={colors.secondary}
 				/>
 			}
 		>
@@ -130,83 +116,51 @@ export default function Home() {
 				<View style={styles.headerSection}>
 					<Text style={styles.welcomeText}>Welcome to</Text>
 					<Text style={styles.appTitle}>lolo</Text>
-					<Text style={styles.subtitle}>
-						Share and discover dating experiences
-					</Text>
 				</View>
 
 				{/* Quick Stats */}
 				<View style={styles.statsContainer}>
-					<View style={styles.statCard}>
+					<TouchableOpacity style={styles.statCard} onPress={handleViewPeople}>
 						<Text style={styles.statNumber}>{formData.people.length}</Text>
 						<Text style={styles.statLabel}>People</Text>
-					</View>
-					<View style={styles.statCard}>
+					</TouchableOpacity>
+					<TouchableOpacity style={styles.statCard} onPress={handleViewDates}>
 						<Text style={styles.statNumber}>{formData.dates.length}</Text>
 						<Text style={styles.statLabel}>Dates</Text>
-					</View>
-				</View>
-
-				{/* Action Buttons */}
-				<View style={styles.actionsContainer}>
-					<TouchableOpacity
-						style={[styles.button, styles.primaryButton]}
-						onPress={handleAddPerson}
-					>
-						<Text style={styles.buttonText}>Add a Person</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						style={[styles.button, styles.secondaryButton]}
-						onPress={handleAddDate}
-					>
-						<Text style={styles.secondaryButtonText}>Add a Date</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						style={[styles.button, styles.tertiaryButton]}
-						onPress={handleViewPeople}
-					>
-						<Text style={styles.tertiaryButtonText}>View People</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						style={[styles.button, styles.outlineButton]}
-						onPress={handleViewDates}
-					>
-						<Text style={styles.outlineButtonText}>View Dates</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						style={[styles.button, styles.outlineButton]}
-						onPress={handleSignOut}
-					>
-						<Text style={styles.outlineButtonText}>Sign Out</Text>
 					</TouchableOpacity>
 				</View>
 
 				{/* Recent Activity */}
 				<View style={styles.recentSection}>
 					<Text style={styles.sectionTitle}>Recent Activity</Text>
-					{formData.loading ? (
-						<View style={styles.emptyState}>
-							<Text style={styles.emptyStateText}>Loading...</Text>
-						</View>
-					) : formData.people.length === 0 && formData.dates.length === 0 ? (
-						<View style={styles.emptyState}>
-							<Text style={styles.emptyStateText}>
-								No activity yet. Start by adding people or dates!
-							</Text>
-						</View>
-					) : (
-						<View style={styles.emptyState}>
-							<Text style={styles.emptyStateText}>
-								{formData.people.length} people and {formData.dates.length}{" "}
-								dates in your collection
-							</Text>
-						</View>
+					{formData.loading && (
+						<Text style={styles.loadingText}>Loading...</Text>
 					)}
+					{!formData.loading &&
+						formData.people.length === 0 &&
+						formData.dates.length === 0 && (
+							<View style={styles.emptyState}>
+								<Text style={styles.emptyStateText}>
+									No activity yet. Start by adding a person or a date!
+								</Text>
+							</View>
+						)}
+
+					{!formData.loading &&
+						(formData.people.length > 0 || formData.dates.length > 0) && (
+							<View>
+								{/* You can map recent items here */}
+								<Text style={styles.activityItem}>
+									You have {formData.people.length} people and{" "}
+									{formData.dates.length} dates.
+								</Text>
+							</View>
+						)}
 				</View>
+
+				<TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+					<Text style={styles.signOutButtonText}>Sign Out</Text>
+				</TouchableOpacity>
 			</View>
 		</ScrollView>
 	);
@@ -220,133 +174,72 @@ const styles = StyleSheet.create({
 	content: {
 		padding: spacing.lg,
 		paddingTop: spacing.xl,
+		paddingBottom: spacing.xxl,
 	},
 	headerSection: {
 		alignItems: "center",
-		marginBottom: spacing.xxl,
+		marginBottom: spacing.xl,
 	},
 	welcomeText: {
-		...typography.caption,
+		...typography.body,
 		color: colors.textSecondary,
 		marginBottom: spacing.xs,
 	},
 	appTitle: {
 		...typography.h1,
-		color: colors.primary,
-		marginBottom: spacing.sm,
-		letterSpacing: -1,
-	},
-	subtitle: {
-		...typography.caption,
-		color: colors.textSecondary,
-		textAlign: "center",
-		lineHeight: 20,
+		color: colors.text,
+		letterSpacing: -1.5,
 	},
 	statsContainer: {
 		flexDirection: "row",
-		justifyContent: "space-between",
+		justifyContent: "space-around",
 		marginBottom: spacing.xxl,
+		gap: spacing.lg,
 	},
 	statCard: {
+		backgroundColor: colors.white,
 		flex: 1,
-		backgroundColor: colors.surface,
-		borderRadius: borderRadius.lg,
 		padding: spacing.lg,
-		marginHorizontal: spacing.xs,
+		borderRadius: borderRadius.lg,
 		alignItems: "center",
+		justifyContent: "center",
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 12,
+		elevation: 5,
 		borderWidth: 1,
 		borderColor: colors.border,
-		shadowColor: colors.black,
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 8,
-		elevation: 4,
 	},
 	statNumber: {
-		...typography.h2,
-		color: colors.primary,
-		marginBottom: spacing.xs,
+		...typography.h1,
+		fontSize: 40,
+		color: colors.secondary,
 	},
 	statLabel: {
-		...typography.caption,
+		...typography.body,
 		color: colors.textSecondary,
-		textAlign: "center",
-	},
-	actionsContainer: {
-		marginBottom: spacing.xxl,
-	},
-	button: {
-		paddingVertical: spacing.md,
-		borderRadius: borderRadius.md,
-		alignItems: "center",
-		marginBottom: spacing.md,
-		minHeight: 56,
-		justifyContent: "center",
-	},
-	primaryButton: {
-		backgroundColor: colors.primary,
-		shadowColor: colors.primary,
-		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.3,
-		shadowRadius: 8,
-		elevation: 8,
-	},
-	secondaryButton: {
-		backgroundColor: colors.success,
-		shadowColor: colors.success,
-		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.3,
-		shadowRadius: 8,
-		elevation: 8,
-	},
-	tertiaryButton: {
-		backgroundColor: colors.secondary,
-		shadowColor: colors.secondary,
-		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.3,
-		shadowRadius: 8,
-		elevation: 8,
-	},
-	outlineButton: {
-		backgroundColor: "transparent",
-		borderWidth: 1,
-		borderColor: colors.border,
-	},
-	buttonText: {
-		color: colors.white,
-		fontSize: typography.bodyBold.fontSize,
-		fontWeight: typography.bodyBold.fontWeight,
-		letterSpacing: 0.5,
-	},
-	secondaryButtonText: {
-		color: colors.white,
-		fontSize: typography.bodyBold.fontSize,
-		fontWeight: typography.bodyBold.fontWeight,
-		letterSpacing: 0.5,
-	},
-	tertiaryButtonText: {
-		color: colors.white,
-		fontSize: typography.bodyBold.fontSize,
-		fontWeight: typography.bodyBold.fontWeight,
-	},
-	outlineButtonText: {
-		color: colors.textSecondary,
-		fontSize: typography.bodyBold.fontSize,
-		fontWeight: typography.bodyBold.fontWeight,
+		marginTop: spacing.xs,
 	},
 	recentSection: {
-		marginBottom: spacing.lg,
+		marginBottom: spacing.xl,
 	},
 	sectionTitle: {
 		...typography.h3,
 		color: colors.text,
-		marginBottom: spacing.lg,
-		letterSpacing: -0.5,
+		marginBottom: spacing.md,
 	},
+	loadingText: {
+		...typography.body,
+		color: colors.textSecondary,
+		textAlign: "center",
+		paddingVertical: spacing.xl,
+	},
+
 	emptyState: {
-		backgroundColor: colors.surface,
-		borderRadius: borderRadius.lg,
-		padding: spacing.xl,
+		backgroundColor: colors.white,
+		padding: spacing.lg,
+		borderRadius: borderRadius.md,
 		alignItems: "center",
 		borderWidth: 1,
 		borderColor: colors.border,
@@ -355,7 +248,25 @@ const styles = StyleSheet.create({
 		...typography.body,
 		color: colors.textSecondary,
 		textAlign: "center",
-		lineHeight: 24,
+		lineHeight: 22,
+	},
+	activityItem: {
+		...typography.body,
+		color: colors.text,
+		paddingVertical: spacing.md,
+	},
+	signOutButton: {
+		marginTop: spacing.lg,
+		padding: spacing.md,
+		borderRadius: borderRadius.md,
+		backgroundColor: colors.white,
+		borderWidth: 1,
+		borderColor: colors.border,
+		alignItems: "center",
+	},
+	signOutButtonText: {
+		...typography.bodyBold,
+		color: colors.error,
 	},
 });
 

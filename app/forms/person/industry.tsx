@@ -5,6 +5,7 @@ import {
 	TextInput,
 	TouchableOpacity,
 	ScrollView,
+	Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useFormData } from "../FormContext";
@@ -12,20 +13,24 @@ import { formStyles } from "../FormStyles";
 
 export default function PersonIndustryPage() {
 	const router = useRouter();
-	const { formData, updatePersonData } = useFormData();
+	const { formData, updatePersonData, addPerson } = useFormData();
 	const [industry, setIndustry] = useState(
 		formData.currentPerson.industry || ""
 	);
+	const [isSaving, setIsSaving] = useState(false);
 
-	const handleNext = () => {
+	const handleNext = async () => {
 		if (industry.trim()) {
+			// Update the current person data with the industry
 			updatePersonData("industry", industry.trim());
-			router.push("/forms/person/home");
+
+			// Navigate to the next step
+			router.push("/forms/person/how-we-met");
 		}
 	};
 
 	const handleBack = () => {
-		router.push("/forms/person/height");
+		router.push("/forms/person/age");
 	};
 
 	const handleReturnToHome = () => {
@@ -38,11 +43,15 @@ export default function PersonIndustryPage() {
 			contentContainerStyle={formStyles.contentContainer}
 		>
 			<View style={formStyles.progressContainer}>
-				<View style={formStyles.progressStep}>
-					<Text style={formStyles.progressStepTextInactive}>1</Text>
+				<View
+					style={[formStyles.progressStep, formStyles.progressStepCompleted]}
+				>
+					<Text style={formStyles.progressStepText}>1</Text>
 				</View>
-				<View style={formStyles.progressStep}>
-					<Text style={formStyles.progressStepTextInactive}>2</Text>
+				<View
+					style={[formStyles.progressStep, formStyles.progressStepCompleted]}
+				>
+					<Text style={formStyles.progressStepText}>2</Text>
 				</View>
 				<View style={[formStyles.progressStep, formStyles.progressStepActive]}>
 					<Text style={formStyles.progressStepText}>3</Text>
@@ -50,12 +59,9 @@ export default function PersonIndustryPage() {
 				<View style={formStyles.progressStep}>
 					<Text style={formStyles.progressStepTextInactive}>4</Text>
 				</View>
-				<View style={formStyles.progressStep}>
-					<Text style={formStyles.progressStepTextInactive}>5</Text>
-				</View>
 			</View>
 
-			<Text style={formStyles.header}>What industry do they work in?</Text>
+			<Text style={formStyles.header}>What do they do?</Text>
 			<Text style={formStyles.subtitle}>
 				Enter their profession or industry
 			</Text>

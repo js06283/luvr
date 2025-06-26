@@ -1,30 +1,23 @@
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-// Elegant color palette
+// New color palette from the design
 const colors = {
-	primary: "#6366f1",
-	primaryLight: "#818cf8",
-	primaryDark: "#4f46e5",
-	secondary: "#f59e0b",
-	background: "#0f172a",
-	surface: "#1e293b",
-	surfaceLight: "#334155",
-	text: "#f8fafc",
-	textSecondary: "#cbd5e1",
-	textMuted: "#64748b",
-	success: "#10b981",
-	error: "#ef4444",
-	border: "#334155",
+	background: "#FFFBF8", // A warm off-white
+	text: "#1E1E1E", // Dark charcoal
+	primary: "#D8D1E9", // Light Lavender
+	secondary: "#F5A895", // Coral/Salmon Pink
+	accent: "#8E9AAF", // Slate Blue/Gray
 	white: "#ffffff",
-	black: "#000000",
+	textMuted: "#8E9AAF", // Using accent for muted text
+	border: "#EAEAEA", // A light gray for borders
 };
 
 export default function TabLayout() {
 	return (
 		<Tabs
 			screenOptions={{
-				tabBarActiveTintColor: colors.primary,
+				tabBarActiveTintColor: colors.secondary,
 				tabBarInactiveTintColor: colors.textMuted,
 				headerStyle: {
 					backgroundColor: colors.background,
@@ -36,12 +29,16 @@ export default function TabLayout() {
 					fontSize: 20,
 				},
 				tabBarStyle: {
-					backgroundColor: colors.surface,
+					backgroundColor: colors.white,
 					borderTopWidth: 1,
 					borderTopColor: colors.border,
 					paddingBottom: 8,
 					paddingTop: 8,
 					height: 88,
+					shadowColor: "#000",
+					shadowOffset: { width: 0, height: -2 },
+					shadowOpacity: 0.05,
+					shadowRadius: 6,
 				},
 				tabBarLabelStyle: {
 					fontSize: 12,
